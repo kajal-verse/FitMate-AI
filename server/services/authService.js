@@ -1,5 +1,6 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 // register
 const registerUser = async (userData) => {
@@ -62,10 +63,20 @@ const loginUser = async (userData) => {
     throw new Error("Invalid email or password.");
   }
 
-  // Step 4: Return success
+   //step-4 Generate JWT
+  const token = jwt.sign(
+    { id: user._id },
+    process.env.JWT_SECRET,
+    {
+      expiresIn: "7d",
+    }
+  );
+
+  // Step 5: Return success
   return {
     success: true,
     message: "Login successful.",
+    token,
     user: {
       id: user._id,
       name: user.name,
@@ -73,7 +84,42 @@ const loginUser = async (userData) => {
     },
   };
 };
+
+// updateProfile
+const updateProfile = async (userId, userData) => {
+  const user = await User.findById(userId);
+
+  if (!user) {
+    throw new Error("User not found.");
+  }
+
+  const allowedFields = [
+    "name",
+    "age",
+    "gender",
+    "height",
+    "weight",
+    "fitnessGoal",
+    "activityLevel",
+    "profileImage",
+  ];
+
+  allowedFields.forEach((field) => {
+    if (userData[field] !== undefined) {
+      user[field] = userData[field];
+    }
+  });
+
+  await user.save();
+
+  return {
+    success: true,
+    message: "Profile updated successfully.",
+    user,
+  };
+};
 module.exports = {
   registerUser,
   loginUser,
+  updateProfile,
 };
