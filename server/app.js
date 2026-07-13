@@ -7,6 +7,7 @@ const workoutRoutes = require("./routes/workoutRoutes");
 const mealRoutes = require("./routes/mealRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const aiRoutes = require("./routes/aiRoutes");
 
 const app = express();
 
@@ -20,7 +21,7 @@ app.use("/api/workouts", workoutRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/dashboard", dashboardRoutes);
-
+app.use("/api/ai", aiRoutes);
 
 app.get("/", (req, res) => {
   res.json({
