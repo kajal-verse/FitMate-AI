@@ -6,6 +6,7 @@ const authRoutes = require("./routes/authRoutes");
 const workoutRoutes = require("./routes/workoutRoutes");
 const mealRoutes = require("./routes/mealRoutes");
 const progressRoutes = require("./routes/progressRoutes");
+const dashboardRoutes = require("./routes/dashboardRoutes");
 
 const app = express();
 
@@ -18,6 +19,8 @@ app.use("/api/auth", authRoutes);
 app.use("/api/workouts", workoutRoutes);
 app.use("/api/meals", mealRoutes);
 app.use("/api/progress", progressRoutes);
+app.use("/api/dashboard", dashboardRoutes);
+
 
 app.get("/", (req, res) => {
   res.json({

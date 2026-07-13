@@ -118,6 +118,8 @@ const updateProfile = async (userId, userData) => {
     user,
   };
 };
+
+
 module.exports = {
   registerUser,
   loginUser,
