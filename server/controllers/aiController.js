@@ -69,8 +69,35 @@ const chatAssistant = async (req, res) => {
     });
   }
 };
+
+const analyzeNutrition = async (req, res) => {
+  try {
+    const { foodName } = req.body;
+
+    if (!foodName) {
+      return res.status(400).json({
+        success: false,
+        message: "Food name is required.",
+      });
+    }
+
+    const result = await aiService.getNutrition(foodName);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    console.error("Nutrition Error:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 module.exports = {
   mealRecommendation,
   workoutRecommendation,
   chatAssistant,
+  analyzeNutrition,
 };

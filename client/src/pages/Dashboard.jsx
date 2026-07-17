@@ -1,63 +1,177 @@
-import { Link } from "react-router-dom";
-import { FaRunning, FaAppleAlt, FaRobot, FaHeartbeat } from "react-icons/fa";
+import { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import {
+  FaRunning,
+  FaAppleAlt,
+  FaHeartbeat,
+  FaRobot,
+  FaUser,
+  FaSignOutAlt,
+} from "react-icons/fa";
+import { getDashboardStats } from "../services/dashboardService";
+import { logoutUser } from "../services/authService";
 
 export default function Dashboard() {
+  const navigate = useNavigate();
+
   const user = JSON.parse(localStorage.getItem("user"));
 
+  const [stats, setStats] = useState({
+    totalWorkouts: 0,
+    totalMeals: 0,
+    latestBMI: "--",
+    latestWeight: "--",
+    goalWeight: "--",
+    weightDifference: "--",
+  });
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const loadDashboard = async () => {
+    try {
+      const response = await getDashboardStats();
+      setStats(response.stats);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const handleLogout = async () => {
+    await logoutUser();
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-slate-100">
 
       {/* Navbar */}
-      <div className="bg-green-600 text-white p-5 flex justify-between items-center">
+      <div className="bg-green-600 text-white px-8 py-4 flex justify-between items-center">
 
         <h1 className="text-3xl font-bold">
           FitMate AI
         </h1>
 
-        <div>
-          Welcome, <b>{user?.name}</b>
+        <div className="flex items-center gap-6">
+
+          <span>
+            Welcome, <b>{user?.name}</b>
+          </span>
+
+          <button
+            onClick={handleLogout}
+            className="flex items-center gap-2 bg-red-500 px-4 py-2 rounded-lg hover:bg-red-600"
+          >
+            <FaSignOutAlt />
+            Logout
+          </button>
+
         </div>
 
       </div>
 
-      <div className="max-w-6xl mx-auto p-8">
+      <div className="max-w-7xl mx-auto p-8">
 
         <h2 className="text-3xl font-bold mb-8">
           Dashboard
         </h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {/* Statistics */}
+
+        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">🏋️ Total Workouts</h3>
+            <p className="text-4xl font-bold text-green-600 mt-3">
+              {stats.totalWorkouts}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">🥗 Total Meals</h3>
+            <p className="text-4xl font-bold text-orange-500 mt-3">
+              {stats.totalMeals}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">❤️ Latest BMI</h3>
+            <p className="text-4xl font-bold text-red-500 mt-3">
+              {stats.latestBMI || "--"}
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">⚖️ Current Weight</h3>
+            <p className="text-4xl font-bold">
+              {stats.latestWeight || "--"} kg
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">🎯 Goal Weight</h3>
+            <p className="text-4xl font-bold">
+              {stats.goalWeight || "--"} kg
+            </p>
+          </div>
+
+          <div className="bg-white rounded-xl shadow p-6">
+            <h3 className="text-gray-500">📉 Difference</h3>
+            <p className="text-4xl font-bold text-blue-600">
+              {stats.weightDifference ?? "--"} kg
+            </p>
+          </div>
+
+        </div>
+
+        {/* Quick Actions */}
+
+        <h3 className="text-2xl font-bold mb-5">
+          Quick Actions
+        </h3>
+
+        <div className="grid md:grid-cols-3 lg:grid-cols-6 gap-5">
 
           <Link
             to="/workouts"
-            className="bg-white shadow rounded-xl p-6 hover:shadow-lg"
+            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
           >
-            <FaRunning className="text-4xl text-green-600 mb-3" />
-            <h3 className="font-bold text-xl">Workouts</h3>
+            <FaRunning className="mx-auto text-4xl text-green-600 mb-3" />
+            Workouts
           </Link>
 
           <Link
             to="/meals"
-            className="bg-white shadow rounded-xl p-6 hover:shadow-lg"
+            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
           >
-            <FaAppleAlt className="text-4xl text-orange-500 mb-3" />
-            <h3 className="font-bold text-xl">Meals</h3>
+            <FaAppleAlt className="mx-auto text-4xl text-orange-500 mb-3" />
+            Meals
           </Link>
 
           <Link
-            to="/bmi"
-            className="bg-white shadow rounded-xl p-6 hover:shadow-lg"
+            to="/progress"
+            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
           >
-            <FaHeartbeat className="text-4xl text-red-500 mb-3" />
-            <h3 className="font-bold text-xl">BMI</h3>
+            <FaHeartbeat className="mx-auto text-4xl text-red-500 mb-3" />
+            Progress
           </Link>
 
           <Link
             to="/ai-chat"
-            className="bg-white shadow rounded-xl p-6 hover:shadow-lg"
+            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
           >
-            <FaRobot className="text-4xl text-blue-500 mb-3" />
-            <h3 className="font-bold text-xl">AI Assistant</h3>
+            <FaRobot className="mx-auto text-4xl text-blue-500 mb-3" />
+            AI Chat
+          </Link>
+
+          <Link
+            to="/profile"
+            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
+          >
+            <FaUser className="mx-auto text-4xl text-purple-500 mb-3" />
+            Profile
           </Link>
 
         </div>

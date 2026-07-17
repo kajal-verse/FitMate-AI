@@ -54,6 +54,21 @@ const updateProfile = async (req, res) => {
   }
 };
 
+
+const getProfile = async (req, res) => {
+  try {
+    const result = await authService.getProfile(req.user._id);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+
 // logout
 const logout = (req, res) => {
   res.clearCookie("token");
@@ -69,4 +84,5 @@ module.exports = {
   login,
   updateProfile,
   logout,
+  getProfile,
 };

@@ -1,127 +1,94 @@
 const { GoogleGenAI } = require("@google/genai");
-const { chatAssistant } = require("../controllers/aiController");
 
 const ai = new GoogleGenAI({
   apiKey: process.env.GEMINI_API_KEY,
 });
 
+// ================= Meal Recommendation =================
+
 const generateMealPlan = async (goal) => {
   const prompt = `
-You are a professional fitness nutritionist.
+You are a professional nutritionist.
 
 Create a healthy one-day meal plan.
 
 Goal: ${goal}
 
 Include:
-- Breakfast
-- Lunch
-- Dinner
-- Snacks
+Breakfast
+Lunch
+Dinner
+Snack
 
-Keep the response short and practical.
+Keep it short.
 `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-    });
-
-    return {
-      success: true,
-      source: "Gemini AI",
-      recommendation: response.text,
-    };
-  } catch (error) {
-  console.error("Gemini Error:", error.message);
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
   return {
     success: true,
-    source: "Fallback Recommendation",
-    recommendation: `
-🥣 Breakfast
-• Oatmeal with banana
-
-🍗 Lunch
-• Grilled chicken with brown rice
-
-🥜 Snack
-• Apple and almonds
-
-🍲 Dinner
-• Vegetable soup with boiled eggs
-`,
+    recommendation: response.text,
   };
-}
 };
 
+// ================= Workout Recommendation =================
 
 const generateWorkoutPlan = async (goal, experience) => {
   const prompt = `
-You are a certified fitness trainer.
+You are a fitness trainer.
 
 Create a 7-day workout plan.
 
 Goal: ${goal}
 Experience: ${experience}
 
-Include:
-- Day 1
-- Day 2
-- Day 3
-- Day 4
-- Day 5
-- Day 6
-- Day 7
-
-Keep it simple and practical.
+Keep it practical.
 `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: prompt,
-    });
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: prompt,
+  });
 
-    return {
-      success: true,
-      source: "Gemini AI",
-      recommendation: response.text,
-    };
-  } catch (error) {
-    console.error("Gemini Error:", error.message);
-
-    return {
-      success: true,
-      source: "Fallback Recommendation",
-      recommendation: `
-🏋️ Day 1: Chest & Triceps
-
-🏋️ Day 2: Back & Biceps
-
-🏋️ Day 3: Legs
-
-🏋️ Day 4: Rest
-
-🏋️ Day 5: Shoulders
-
-🏋️ Day 6: Full Body
-
-🏋️ Day 7: Cardio & Stretching
-`,
-    };
-  }
+  return {
+    success: true,
+    recommendation: response.text,
+  };
 };
+
+// ================= AI Chat =================
 
 const chatWithAI = async (message) => {
+  const response = await ai.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: message,
+  });
+
+  return {
+    success: true,
+    reply: response.text,
+  };
+};
+
+// ================= Nutrition Analyzer =================
+
+const getNutrition = async (foodName) => {
   const prompt = `
-You are FitMate AI, a friendly and knowledgeable fitness assistant.
+Estimate nutrition for:
 
-Answer the following user's fitness question in a simple, clear, and motivating way.
+${foodName}
 
-Question:
-${message}
+Return ONLY valid JSON.
+
+{
+  "calories": number,
+  "protein": number,
+  "carbs": number,
+  "fat": number
+}
 `;
 
   try {
@@ -130,25 +97,51 @@ ${message}
       contents: prompt,
     });
 
-    return {
-      success: true,
-      source: "Gemini AI",
-      reply: response.text,
-    };
-  } catch (error) {
-    console.error("Gemini Error:", error.message);
+    let text = response.text.trim();
+
+    text = text.replace(/```json/g, "")
+               .replace(/```/g, "")
+               .trim();
 
     return {
       success: true,
-      source: "Fallback Recommendation",
-      reply:
-        "Regular exercise, a balanced diet, proper hydration, and 7–8 hours of sleep are the foundation of good fitness. Stay consistent and consult a healthcare professional for personalized medical advice.",
+      nutrition: JSON.parse(text),
+    };
+
+  } catch (error) {
+
+    console.log("Gemini unavailable. Using fallback.");
+
+    // Simple estimated nutrition values
+    const nutritionDatabase = {
+      "banana": { calories: 105, protein: 1.3, carbs: 27, fat: 0.3 },
+      "apple": { calories: 95, protein: 0.5, carbs: 25, fat: 0.3 },
+      "egg": { calories: 78, protein: 6, carbs: 0.6, fat: 5 },
+      "rice": { calories: 205, protein: 4.3, carbs: 45, fat: 0.4 },
+      "chicken breast": { calories: 165, protein: 31, carbs: 0, fat: 3.6 },
+      "chicken biryani": { calories: 420, protein: 24, carbs: 46, fat: 14 },
+      "milk": { calories: 103, protein: 8, carbs: 12, fat: 2.4 },
+      "oatmeal": { calories: 150, protein: 5, carbs: 27, fat: 3 },
+    };
+
+    const key = foodName.toLowerCase();
+
+    return {
+      success: true,
+      nutrition:
+        nutritionDatabase[key] || {
+          calories: 250,
+          protein: 10,
+          carbs: 30,
+          fat: 8,
+        },
     };
   }
 };
 
-module.exports ={
-    generateMealPlan,
-    generateWorkoutPlan,
-    chatWithAI,
+module.exports = {
+  generateMealPlan,
+  generateWorkoutPlan,
+  chatWithAI,
+  getNutrition,
 };
