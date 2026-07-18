@@ -6,7 +6,7 @@ import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Workout from './pages/Workout';
 import Meal from "./pages/Meal";
-
+import Progress from "./pages/Progress";
 
 
 function App() {
@@ -21,7 +21,7 @@ function App() {
       <Route path="/profile" element={<Profile />} />
       <Route path="/workouts" element={<Workout />} />
       <Route path="/meals" element={<Meal />} />
-
+<Route path="/progress" element={<Progress />} />
     </Routes>
   );
 }
