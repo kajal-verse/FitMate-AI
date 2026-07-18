@@ -63,6 +63,7 @@ const chatAssistant = async (req, res) => {
     return res.status(200).json(result);
 
   } catch (error) {
+      console.error("Chat Error:", error); 
     return res.status(500).json({
       success: false,
       message: error.message,

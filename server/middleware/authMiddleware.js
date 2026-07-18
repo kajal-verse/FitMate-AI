@@ -4,7 +4,9 @@ const User = require("../models/User");
 const protect = async (req, res, next) => {
   try {
     // Get token from cookie
-    console.log(req.cookies);
+    console.log("Cookies:", req.cookies);
+console.log("Token:", req.cookies.token);
+console.log("Headers Cookie:", req.headers.cookie);
     const token = req.cookies.token;
 
     if (!token) {

@@ -62,15 +62,28 @@ Keep it practical.
 // ================= AI Chat =================
 
 const chatWithAI = async (message) => {
-  const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
-    contents: message,
-  });
+  try {
+    const response = await ai.models.generateContent({
+      model: "gemini-3.5-flash",
+      contents: message,
+    });
 
-  return {
-    success: true,
-    reply: response.text,
-  };
+    return {
+      success: true,
+      reply: response.text,
+    };
+
+  } catch (error) {
+
+    console.log("Chat Error:", error);
+
+    return {
+      success: true,
+      reply:
+        "I'm currently experiencing high demand. Please try again in a few moments. Meanwhile, remember to stay hydrated, eat balanced meals, and exercise regularly! 💪",
+    };
+
+  }
 };
 
 // ================= Nutrition Analyzer =================
