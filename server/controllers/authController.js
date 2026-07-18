@@ -42,7 +42,8 @@ const updateProfile = async (req, res) => {
   try {
     const result = await authService.updateProfile(
       req.user._id,
-      req.body
+      req.body,
+      req.file
     );
 
     return res.status(200).json(result);

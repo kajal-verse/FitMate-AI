@@ -1,6 +1,7 @@
 const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cloudinary = require("../config/cloudinary");
 
 // register
 const registerUser = async (userData) => {
@@ -86,12 +87,28 @@ const loginUser = async (userData) => {
 };
 
 // updateProfile
-const updateProfile = async (userId, userData) => {
+// updateProfile
+const updateProfile = async (userId, userData, file) => {
   const user = await User.findById(userId);
 
   if (!user) {
     throw new Error("User not found.");
   }
+
+  // Upload image to Cloudinary
+  if (file) {
+    const base64Image = file.buffer.toString("base64");
+
+    const result = await cloudinary.uploader.upload(
+      `data:${file.mimetype};base64,${base64Image}`,
+      {
+        folder: "fitmate/profile",
+      }
+    );
+
+    user.profileImage = result.secure_url;
+  }
+
 
   const allowedFields = [
     "name",
@@ -101,14 +118,15 @@ const updateProfile = async (userId, userData) => {
     "weight",
     "fitnessGoal",
     "activityLevel",
-    "profileImage",
   ];
+
 
   allowedFields.forEach((field) => {
     if (userData[field] !== undefined) {
       user[field] = userData[field];
     }
   });
+
 
   await user.save();
 

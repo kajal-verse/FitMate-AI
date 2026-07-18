@@ -17,8 +17,10 @@ export default function Profile() {
     profileImage: "",
   });
 
+  const [image, setImage] = useState(null);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [isEditing, setIsEditing] = useState(false);
 
   // Load profile when page opens
   useEffect(() => {
@@ -48,6 +50,10 @@ export default function Profile() {
   }
 };
 
+const handleImageChange = (e) => {
+  setImage(e.target.files[0]);
+};
+
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -58,11 +64,26 @@ export default function Profile() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    setMessage("");
-    setError("");
+    //setMessage("");
+    //setError("");
 
     try {
-      const response = await updateProfile(formData);
+
+       const data = new FormData();
+
+    data.append("name", formData.name);
+    data.append("age", formData.age);
+    data.append("gender", formData.gender);
+    data.append("height", formData.height);
+    data.append("weight", formData.weight);
+    data.append("fitnessGoal", formData.fitnessGoal);
+    data.append("firnessLevel", formData.fitnessLevel);
+    data.append("workoutLocation",formData.workoutLocation);
+
+    if (image) {
+      data.append("profileImage", image);
+    }
+      const response = await updateProfile(data);
 
       setMessage(response.message);
     } catch (err) {
@@ -93,7 +114,66 @@ export default function Profile() {
           </p>
         )}
 
-        <form onSubmit={handleSubmit} className="space-y-4">
+{!isEditing ? (
+  <div>
+<div className="text-center">
+
+  <img
+    src={
+      formData.profileImage ||
+      "https://via.placeholder.com/150"
+    }
+    className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-green-500"
+  />
+
+  <h2 className="text-2xl font-bold mt-4">
+    {formData.name}
+  </h2>
+
+</div>
+
+<div className="grid grid-cols-2 gap-4 mt-8">
+
+  <div className="bg-gray-100 p-4 rounded">
+    <p className="text-gray-500">Age</p>
+    <h3 className="font-bold">
+      {formData.age} years
+    </h3>
+  </div>
+
+  <div className="bg-gray-100 p-4 rounded">
+    <p className="text-gray-500">Gender</p>
+    <h3 className="font-bold">
+      {formData.gender}
+    </h3>
+  </div>
+
+  <div className="bg-gray-100 p-4 rounded">
+    <p className="text-gray-500">Height</p>
+    <h3 className="font-bold">
+      {formData.height} cm
+    </h3>
+  </div>
+
+  <div className="bg-gray-100 p-4 rounded">
+    <p className="text-gray-500">Weight</p>
+    <h3 className="font-bold">
+      {formData.weight} kg
+    </h3>
+  </div>
+
+</div>
+
+
+<button
+  onClick={() => setIsEditing(true)}
+  className="mt-8 w-full bg-green-600 text-white py-3 rounded-lg"
+>
+  ✏ Edit Profile
+</button>
+</div>
+):(
+    <form onSubmit={handleSubmit} className="space-y-4">
 
           <input
             type="text"
@@ -179,24 +259,30 @@ export default function Profile() {
           </select>
 
           <input
-            type="text"
+            type="file"
             name="profileImage"
-            placeholder="Profile Image URL"
-            value={formData.profileImage}
-            onChange={handleChange}
-            className="w-full border p-3 rounded"
+           accept="image/*"
+           onChange={handleImageChange}
+           className="border p-2 rounded w-full"
           />
 
           <button
             type="submit"
             className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
           >
+           <button
+  type="button"
+  onClick={() => setIsEditing(false)}
+  className="w-full bg-gray-500 text-white py-3 rounded-lg"
+>
+  Cancel
+</button> 
             Update Profile
           </button>
 
         </form>
-
-      </div>
+)}
+          </div>
 
     </div>
   );

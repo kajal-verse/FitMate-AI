@@ -3,6 +3,7 @@ const router = express.Router();
 
 const { register,login,updateProfile,getProfile,logout } = require("../controllers/authController");
 const protect = require("../middleware/authMiddleware");
+const upload = require("../middleware/upload");
 
 router.post("/register", register);
 router.post("/login", login);
@@ -12,7 +13,9 @@ router.get("/me", protect, (req, res) => {
     user: req.user,
   });
 });
-router.put("/profile", protect, updateProfile);
+router.put("/profile", protect, 
+  upload.single("profileImage"),
+  updateProfile);
 router.post("/logout", logout);
 router.get("/profile", protect, getProfile);
 
