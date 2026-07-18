@@ -266,19 +266,25 @@ const handleImageChange = (e) => {
            className="border p-2 rounded w-full"
           />
 
-          <button
-            type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
-          >
-           <button
-  type="button"
-  onClick={() => setIsEditing(false)}
-  className="w-full bg-gray-500 text-white py-3 rounded-lg"
->
-  Cancel
-</button> 
-            Update Profile
-          </button>
+          <div className="space-y-3">
+
+  <button
+    type="submit"
+    className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg"
+  >
+    Update Profile
+  </button>
+
+
+  <button
+    type="button"
+    onClick={() => setIsEditing(false)}
+    className="w-full bg-gray-500 hover:bg-gray-600 text-white py-3 rounded-lg"
+  >
+    Cancel
+  </button>
+
+</div>
 
         </form>
 )}
