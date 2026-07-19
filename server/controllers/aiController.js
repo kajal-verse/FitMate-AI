@@ -95,10 +95,27 @@ const analyzeNutrition = async (req, res) => {
   }
 };
 
+const getFitnessAnalysis = async (req, res) => {
+  try {
+
+    const result = await aiService.getFitnessAnalysis(req.user);
+
+    res.json(result);
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+
+  }
+};
 
 module.exports = {
   mealRecommendation,
   workoutRecommendation,
   chatAssistant,
   analyzeNutrition,
+  getFitnessAnalysis,
 };

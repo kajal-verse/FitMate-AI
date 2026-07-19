@@ -24,7 +24,7 @@ Keep it short.
 `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash",
     contents: prompt,
   });
 
@@ -49,7 +49,7 @@ Keep it practical.
 `;
 
   const response = await ai.models.generateContent({
-    model: "gemini-2.5-flash",
+    model: "gemini-3.5-flash",
     contents: prompt,
   });
 
@@ -152,9 +152,64 @@ Return ONLY valid JSON.
   }
 };
 
+const getFitnessAnalysis = async (user) => {
+  const prompt = `
+You are an expert AI Fitness Coach.
+
+Analyze the following user:
+
+Name: ${user.name}
+Age: ${user.age}
+Gender: ${user.gender}
+Height: ${user.height} cm
+Weight: ${user.weight} kg
+Fitness Goal: ${user.fitnessGoal}
+Activity Level: ${user.activityLevel}
+
+Calculate BMI.
+
+Return ONLY valid JSON.
+
+{
+  "bmi": number,
+  "bmiStatus": "",
+  "dailyCalories": "",
+  "protein": "",
+  "water": "",
+  "workout": [
+    "",
+    ""
+  ],
+  "nutrition": [
+    "",
+    ""
+  ],
+  "motivation": ""
+}
+`;
+
+  const response = await ai.models.generateContent({
+    model: "gemini-3.5-flash",
+    contents: prompt,
+  });
+
+  let text = response.text.trim();
+
+  text = text
+    .replace(/```json/g, "")
+    .replace(/```/g, "")
+    .trim();
+
+  return {
+    success: true,
+    analysis: JSON.parse(text),
+  };
+};
+
 module.exports = {
   generateMealPlan,
   generateWorkoutPlan,
   chatWithAI,
   getNutrition,
+  getFitnessAnalysis,
 };
