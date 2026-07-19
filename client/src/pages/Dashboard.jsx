@@ -7,6 +7,11 @@ import {
   FaRobot,
   FaUser,
   FaSignOutAlt,
+   FaComments,
+  FaDumbbell,
+  FaWeight,
+  FaBullseye,
+  FaChartLine,
 } from "react-icons/fa";
 
 import {
@@ -21,6 +26,7 @@ import {
 
 import { getDashboardStats } from "../services/dashboardService";
 import { logoutUser } from "../services/authService";
+
 
 export default function Dashboard() {
   const navigate = useNavigate();
@@ -97,92 +103,113 @@ export default function Dashboard() {
 
       </div>
 
-      <div className="max-w-7xl mx-auto p-8">
+      <div className="max-w-screen-xl mx-auto px-8 py-10">
 
         <h2 className="text-3xl font-bold mb-8">
           Dashboard
         </h2>
 
-        {/* Statistics */}
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
+{/* Statistics */}
 
-          <div className="bg-white rounded-xl shadow p-6">
-            <h3 className="text-gray-500">🏋 Total Workouts</h3>
+<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
 
-            <p className="text-4xl font-bold text-green-600 mt-3">
-              {stats.totalWorkouts}
-            </p>
+  {/* Workouts */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-green-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Total Workouts</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.totalWorkouts}</h2>
+        <p className="text-green-600 text-sm">Completed</p>
+      </div>
 
-          </div>
+      <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center">
+        <FaDumbbell className="text-green-600 text-xl" />
+      </div>
+    </div>
+  </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
+  {/* Meals */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-orange-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Total Meals</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.totalMeals}</h2>
+        <p className="text-orange-600 text-sm">Meals Logged</p>
+      </div>
 
-            <h3 className="text-gray-500">
-              🥗 Total Meals
-            </h3>
+      <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
+        <FaAppleAlt className="text-orange-500 text-xl" />
+      </div>
+    </div>
+  </div>
 
-            <p className="text-4xl font-bold text-orange-500 mt-3">
-              {stats.totalMeals}
-            </p>
+  {/* BMI */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-red-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Latest BMI</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.latestBMI || "--"}</h2>
+        <p className="text-red-600 text-sm">Body Mass Index</p>
+      </div>
 
-          </div>
+      <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center">
+        <FaHeartbeat className="text-red-500 text-xl" />
+      </div>
+    </div>
+  </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
+  {/* Current Weight */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-blue-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Current Weight</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.latestWeight || "--"} kg</h2>
+        <p className="text-blue-600 text-sm">Current</p>
+      </div>
 
-            <h3 className="text-gray-500">
-              ❤️ Latest BMI
-            </h3>
+      <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center">
+        <FaWeight className="text-blue-500 text-xl" />
+      </div>
+    </div>
+  </div>
 
-            <p className="text-4xl font-bold text-red-500 mt-3">
-              {stats.latestBMI || "--"}
-            </p>
+  {/* Goal Weight */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-purple-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Goal Weight</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.goalWeight || "--"} kg</h2>
+        <p className="text-purple-600 text-sm">Target</p>
+      </div>
 
-          </div>
+      <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center">
+        <FaBullseye className="text-purple-500 text-xl" />
+      </div>
+    </div>
+  </div>
 
-          <div className="bg-white rounded-xl shadow p-6">
+  {/* Difference */}
+  <div className="bg-white rounded-2xl shadow-md hover:shadow-xl hover:-translate-y-1 transition-all duration-300 p-4 border-l-4 border-yellow-500">
+    <div className="flex justify-between items-center">
+      <div>
+        <p className="text-gray-500 text-sm">Difference</p>
+        <h2 className="text-2xl font-bold mt-1">{stats.weightDifference ?? "--"} kg</h2>
+        <p className="text-yellow-600 text-sm">To Goal</p>
+      </div>
 
-            <h3 className="text-gray-500">
-              ⚖ Current Weight
-            </h3>
+      <div className="w-12 h-12 rounded-full bg-yellow-100 flex items-center justify-center">
+        <FaChartLine className="text-yellow-600 text-xl" />
+      </div>
+    </div>
+  </div>
 
-            <p className="text-4xl font-bold">
-              {stats.latestWeight || "--"} kg
-            </p>
-
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-6">
-
-            <h3 className="text-gray-500">
-              🎯 Goal Weight
-            </h3>
-
-            <p className="text-4xl font-bold">
-              {stats.goalWeight || "--"} kg
-            </p>
-
-          </div>
-
-          <div className="bg-white rounded-xl shadow p-6">
-
-            <h3 className="text-gray-500">
-              📉 Difference
-            </h3>
-
-            <p className="text-4xl font-bold text-blue-600">
-              {stats.weightDifference ?? "--"} kg
-            </p>
-
-          </div>
-
-        </div>
-
+</div>
         <h3 className="text-2xl font-bold mb-5">
           Quick Actions
         </h3>
 
-        <div className="grid md:grid-cols-3 lg:grid-cols-5 gap-5 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
 
           <Link
             to="/workouts"
@@ -214,6 +241,16 @@ export default function Dashboard() {
 >
   <FaRobot className="mx-auto text-4xl text-blue-500 mb-3" />
   AI Coach
+</Link>
+<Link
+  to="/ai-chat"
+  className="bg-white rounded-xl shadow p-6 hover:shadow-lg transition text-center"
+>
+  <FaComments className="mx-auto text-4xl text-purple-500 mb-3" />
+  <h3 className="font-bold">AI Chat</h3>
+  <p className="text-sm text-gray-500">
+    Ask fitness questions
+  </p>
 </Link>
 
           <Link
