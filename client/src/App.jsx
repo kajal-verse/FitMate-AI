@@ -8,6 +8,7 @@ import Workout from './pages/Workout';
 import Meal from "./pages/Meal";
 import Progress from "./pages/Progress";
 import AI from "./pages/AI";
+import FitnessCoach from "./pages/FitnessCoach";
 
 function App() {
   return (
@@ -23,7 +24,10 @@ function App() {
       <Route path="/meals" element={<Meal />} />
       <Route path="/progress" element={<Progress />} />
       <Route path="/ai-chat" element={<AI />} />
-
+<Route
+  path="/fitness-coach"
+  element={<FitnessCoach />}
+/>
     </Routes>
   );
 }

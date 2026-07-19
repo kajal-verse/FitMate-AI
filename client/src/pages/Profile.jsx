@@ -3,6 +3,7 @@ import {
   getProfile,
   updateProfile,
 } from "../services/authService";
+import { getProgress } from "../services/progressService";
 
 export default function Profile() {
   const [formData, setFormData] = useState({
@@ -21,6 +22,7 @@ export default function Profile() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [isEditing, setIsEditing] = useState(false);
+  const [latestProgress, setLatestProgress] = useState(null);
 
   // Load profile when page opens
   useEffect(() => {
@@ -30,7 +32,11 @@ export default function Profile() {
  const loadProfile = async () => {
   try {
     const response = await getProfile();
+    const progressResponse = await getProgress();
 
+if (progressResponse.progress.length > 0) {
+  setLatestProgress(progressResponse.progress[0]);
+}
     console.log("Response:", response);
     console.log("User:", response.user);
 
@@ -77,7 +83,7 @@ const handleImageChange = (e) => {
     data.append("height", formData.height);
     data.append("weight", formData.weight);
     data.append("fitnessGoal", formData.fitnessGoal);
-    data.append("firnessLevel", formData.fitnessLevel);
+    data.append("fitnessLevel", formData.fitnessLevel);
     data.append("workoutLocation",formData.workoutLocation);
 
     if (image) {
@@ -93,6 +99,50 @@ const handleImageChange = (e) => {
     }
   };
 
+  // calculate BMI
+  const bmi =
+  formData.height && formData.weight
+    ? (
+        formData.weight /
+        Math.pow(formData.height / 100, 2)
+      ).toFixed(1)
+    : null;
+
+const getBMIStatus = () => {
+  if (!bmi) return "";
+
+  if (bmi < 18.5) return "Underweight";
+  if (bmi < 25) return "Normal";
+  if (bmi < 30) return "Overweight";
+
+  return "Obese";
+};
+
+const getBMIColor = () => {
+  if (!bmi) return "text-gray-600";
+
+  if (bmi < 18.5) return "text-yellow-500";
+  if (bmi < 25) return "text-green-600";
+  if (bmi < 30) return "text-orange-500";
+
+  return "text-red-600";
+};
+
+const currentWeight = latestProgress?.weight || 0;
+const goalWeight = latestProgress?.goalWeight || 0;
+
+let progressPercent = 0;
+
+if (currentWeight && goalWeight) {
+  progressPercent =
+    Math.min(
+      100,
+      Math.max(
+        0,
+        ((currentWeight - goalWeight) / currentWeight) * 100
+      )
+    );
+}
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center items-center py-10">
 
@@ -115,55 +165,90 @@ const handleImageChange = (e) => {
         )}
 
 {!isEditing ? (
+  <>
   <div>
-<div className="text-center">
+            <div className="text-center">
 
-  <img
-    src={
-      formData.profileImage ||
-      "https://via.placeholder.com/150"
-    }
-    className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-green-500"
-  />
+              <img
+                src={formData.profileImage ||
+                  "https://via.placeholder.com/150"}
+                className="w-32 h-32 rounded-full mx-auto object-cover border-4 border-green-500" />
 
-  <h2 className="text-2xl font-bold mt-4">
-    {formData.name}
-  </h2>
+              <h2 className="text-2xl font-bold mt-4">
+                {formData.name}
+              </h2>
+
+            </div>
+
+            <div className="grid grid-cols-2 gap-4 mt-8">
+
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">Age</p>
+                <h3 className="font-bold">{formData.age} years</h3>
+              </div>
+
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">Gender</p>
+                <h3 className="font-bold">{formData.gender}</h3>
+              </div>
+
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">Height</p>
+                <h3 className="font-bold">{formData.height} cm</h3>
+              </div>
+
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">Weight</p>
+                <h3 className="font-bold">{formData.weight} kg</h3>
+              </div>
+
+              {/* BMI Card */}
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">BMI</p>
+
+                <h3 className={`font-bold text-xl ${getBMIColor()}`}>
+                  {bmi || "--"}
+                </h3>
+
+                <p className="text-sm mt-1">
+                  {getBMIStatus()}
+                </p>
+              </div>
+
+              {/* Fitness Goal Card */}
+              <div className="bg-gray-100 p-4 rounded">
+                <p className="text-gray-500">Fitness Goal</p>
+
+                <h3 className="font-bold">
+                  {formData.fitnessGoal || "--"}
+                </h3>
+              </div>
+
+            </div>
+
+<div className="mt-8 bg-white border rounded-xl p-5 shadow">
+
+  <h3 className="text-xl font-bold mb-4">
+    🎯 Goal Progress
+  </h3>
+
+  <div className="flex justify-between mb-2">
+    <span>Current: <b>{currentWeight || "--"} kg</b></span>
+    <span>Goal: <b>{goalWeight || "--"} kg</b></span>
+  </div>
+
+  <div className="w-full bg-gray-200 rounded-full h-4">
+    <div
+      className="bg-green-600 h-4 rounded-full transition-all duration-500"
+      style={{ width: `${progressPercent}%` }}
+    ></div>
+  </div>
+
+  <p className="mt-3 text-center text-gray-600">
+    {Math.abs(currentWeight - goalWeight)} kg remaining
+  </p>
 
 </div>
-
-<div className="grid grid-cols-2 gap-4 mt-8">
-
-  <div className="bg-gray-100 p-4 rounded">
-    <p className="text-gray-500">Age</p>
-    <h3 className="font-bold">
-      {formData.age} years
-    </h3>
-  </div>
-
-  <div className="bg-gray-100 p-4 rounded">
-    <p className="text-gray-500">Gender</p>
-    <h3 className="font-bold">
-      {formData.gender}
-    </h3>
-  </div>
-
-  <div className="bg-gray-100 p-4 rounded">
-    <p className="text-gray-500">Height</p>
-    <h3 className="font-bold">
-      {formData.height} cm
-    </h3>
-  </div>
-
-  <div className="bg-gray-100 p-4 rounded">
-    <p className="text-gray-500">Weight</p>
-    <h3 className="font-bold">
-      {formData.weight} kg
-    </h3>
-  </div>
-
-</div>
-
 
 <button
   onClick={() => setIsEditing(true)}
@@ -171,7 +256,11 @@ const handleImageChange = (e) => {
 >
   ✏ Edit Profile
 </button>
-</div>
+
+            
+
+            </div>
+</>
 ):(
     <form onSubmit={handleSubmit} className="space-y-4">
 
@@ -289,7 +378,6 @@ const handleImageChange = (e) => {
         </form>
 )}
           </div>
-
     </div>
   );
 }

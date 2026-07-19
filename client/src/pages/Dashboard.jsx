@@ -208,13 +208,13 @@ export default function Dashboard() {
             Progress
           </Link>
 
-          <Link
-            to="/ai-chat"
-            className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
-          >
-            <FaRobot className="mx-auto text-4xl text-blue-500 mb-3" />
-            AI Chat
-          </Link>
+         <Link
+  to="/fitness-coach"
+  className="bg-white rounded-xl shadow p-6 hover:shadow-lg text-center"
+>
+  <FaRobot className="mx-auto text-4xl text-blue-500 mb-3" />
+  AI Coach
+</Link>
 
           <Link
             to="/profile"

@@ -15,3 +15,10 @@ export const sendMessage = async (message) => {
 
   return response.data;
 };
+
+import api from "./api";
+
+export const getFitnessAnalysis = async () => {
+  const response = await api.post("/ai/fitness-analysis");
+  return response.data;
+};
