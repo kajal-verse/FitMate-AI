@@ -39,6 +39,35 @@ const login = async (req, res) => {
   }
 }; 
 
+const forgotPassword = async (req, res) => {
+  try {
+    const result = await authService.forgotPassword(req.body.email);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    const result = await authService.resetPassword(token, password);
+
+    return res.status(200).json(result);
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 const updateProfile = async (req, res) => {
   try {
     const result = await authService.updateProfile(
@@ -122,6 +151,8 @@ const verifyEmail = async (req, res) => {
 module.exports = {
   register,
   login,
+  forgotPassword,
+  resetPassword,
   updateProfile,
   logout,
   getProfile,

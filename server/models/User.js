@@ -54,10 +54,23 @@ const userSchema = new mongoose.Schema(
       enum: ["Home", "Gym"],
     },
 
-    profileImage: {
-      type: String,
-      default: "",
-    },
+   profileImage: {
+  type: String,
+  default: "",
+},
+
+isVerified: {
+  type: Boolean,
+  default: false,
+},
+
+verificationToken: {
+  type: String,
+},
+
+verificationTokenExpires: {
+  type: Date,
+},
   },
   {
     timestamps: true,

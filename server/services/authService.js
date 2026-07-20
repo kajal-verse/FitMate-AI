@@ -119,6 +119,77 @@ const loginUser = async (userData) => {
     },
   };
 };
+const forgotPassword = async (email) => {
+  const user = await User.findOne({ email });
+
+  if (!user) {
+    throw new Error("No account found with this email.");
+  }
+
+  const resetToken = crypto.randomBytes(32).toString("hex");
+
+  user.resetPasswordToken = resetToken;
+  user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+
+  await user.save();
+
+  await sendEmail({
+    to: user.email,
+    subject: "Reset Your FitMate Password",
+    html: `
+      <h2>Forgot your password?</h2>
+
+      <p>Click the button below to reset your password.</p>
+
+      <a
+        href="http://localhost:5173/reset-password/${resetToken}"
+        style="
+          background:#2563eb;
+          color:white;
+          padding:12px 20px;
+          border-radius:8px;
+          text-decoration:none;
+          display:inline-block;
+        "
+      >
+        Reset Password
+      </a>
+
+      <p>This link expires in 1 hour.</p>
+    `,
+  });
+
+  return {
+    success: true,
+    message: "Password reset email sent successfully.",
+  };
+};
+
+const resetPassword = async (token, newPassword) => {
+  const user = await User.findOne({
+    resetPasswordToken: token,
+    resetPasswordExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    throw new Error("Invalid or expired reset link.");
+  }
+
+  const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+  user.password = hashedPassword;
+
+  user.resetPasswordToken = undefined;
+  user.resetPasswordExpires = undefined;
+
+  await user.save();
+
+  return {
+    success: true,
+    message: "Password reset successfully.",
+  };
+};
+
 
 // updateProfile
 const updateProfile = async (userId, userData, file) => {
@@ -184,8 +255,10 @@ const getProfile = async (userId) => {
 };
 
 module.exports = {
-  registerUser,
-  loginUser,
-  updateProfile,
-  getProfile,
+   registerUser,
+   loginUser,
+   forgotPassword,
+   resetPassword,
+   updateProfile,
+   getProfile,
 };
