@@ -8,6 +8,7 @@ const mealRoutes = require("./routes/mealRoutes");
 const progressRoutes = require("./routes/progressRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const aiRoutes = require("./routes/aiRoutes");
+const testEmailRoute = require("./routes/testEmailRoute");
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use("/api/meals", mealRoutes);
 app.use("/api/progress", progressRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/ai", aiRoutes);
+app.use("/api", testEmailRoute);
 
 // test route
 app.get("/", (req, res) => {

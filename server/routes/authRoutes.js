@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
 
-const { register,login,updateProfile,getProfile,logout } = require("../controllers/authController");
+const { register,verifyEmail,login,updateProfile,getProfile,logout } = require("../controllers/authController");
 const protect = require("../middleware/authMiddleware");
 const upload = require("../middleware/upload");
 
 router.post("/register", register);
+router.get("/verify-email/:token", verifyEmail);
 router.post("/login", login);
 router.get("/me", protect, (req, res) => {
   res.status(200).json({

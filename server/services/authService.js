@@ -2,6 +2,8 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cloudinary = require("../config/cloudinary");
+const crypto = require("crypto");
+const sendEmail = require("../utils/sendEmail");
 
 // register
 const registerUser = async (userData) => {
@@ -20,18 +22,50 @@ if (existingUser) {
 }
  // 3. Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
+  const verificationToken = crypto.randomBytes(32).toString("hex");
 
   // 4. Save user
   const user = await User.create({
     name,
     email,
     password: hashedPassword,
+
+     verificationToken,
+  verificationTokenExpires: Date.now() + 24 * 60 * 60 * 1000, // 24 hours
   });
+
+  await sendEmail({
+  to: user.email,
+  subject: "Verify your FitMate Account",
+  html: `
+    <h2>Welcome to FitMate!</h2>
+
+    <p>Thank you for registering.</p>
+
+    <p>Please click the button below to verify your email.</p>
+
+    <a
+      href="http://localhost:5000/api/auth/verify-email/${verificationToken}"
+      style="
+        background:#16a34a;
+        color:white;
+        padding:12px 20px;
+        text-decoration:none;
+        border-radius:8px;
+        display:inline-block;
+      "
+    >
+      Verify Email
+    </a>
+
+    <p>This link expires in 24 hours.</p>
+  `,
+});
 
   // Temporary response
   return {
     success: true,
-    message: "Validation successful.",
+    message: "Registration successful. Please check your email to verify your account.",
     data: {
       name,
       email,
@@ -86,7 +120,6 @@ const loginUser = async (userData) => {
   };
 };
 
-// updateProfile
 // updateProfile
 const updateProfile = async (userId, userData, file) => {
   const user = await User.findById(userId);

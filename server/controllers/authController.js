@@ -1,5 +1,6 @@
 const authService = require("../services/authService");
 
+
 const register = async (req, res) => {
   try {
     const result = await authService.registerUser(req.body);
@@ -80,10 +81,49 @@ const logout = (req, res) => {
   });
 };
 
+
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const User = require("../models/User");
+
+    const user = await User.findOne({
+      verificationToken: token,
+      verificationTokenExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid or expired verification link.",
+      });
+    }
+
+    user.isVerified = true;
+    user.verificationToken = undefined;
+    user.verificationTokenExpires = undefined;
+
+    await user.save();
+
+    res.json({
+      success: true,
+      message: "Email verified successfully.",
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message,
+    });
+  }
+};
+
 module.exports = {
   register,
   login,
   updateProfile,
   logout,
   getProfile,
+  verifyEmail,
 };
