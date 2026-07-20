@@ -67,7 +67,6 @@ const resetPassword = async (req, res) => {
     });
   }
 };
-
 const updateProfile = async (req, res) => {
   try {
     const result = await authService.updateProfile(

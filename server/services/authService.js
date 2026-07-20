@@ -97,6 +97,10 @@ const loginUser = async (userData) => {
   if (!isMatch) {
     throw new Error("Invalid email or password.");
   }
+  
+if (!user.isVerified) {
+  throw new Error("Please verify your email before logging in.");
+}
 
    //step-4 Generate JWT
   const token = jwt.sign(
@@ -119,6 +123,7 @@ const loginUser = async (userData) => {
     },
   };
 };
+
 const forgotPassword = async (email) => {
   const user = await User.findOne({ email });
 
@@ -128,36 +133,37 @@ const forgotPassword = async (email) => {
 
   const resetToken = crypto.randomBytes(32).toString("hex");
 
+
+  console.log("Generated reset token:", resetToken);
+
   user.resetPasswordToken = resetToken;
-  user.resetPasswordExpires = Date.now() + 60 * 60 * 1000; // 1 hour
+  user.resetPasswordExpires = Date.now() + 60 * 60 * 1000;
 
   await user.save();
 
+  console.log("User after save:", user);
+
+  const updatedUser = await User.findById(user._id);
+  console.log("User from DB:", updatedUser);
+
+
   await sendEmail({
-    to: user.email,
-    subject: "Reset Your FitMate Password",
-    html: `
-      <h2>Forgot your password?</h2>
+  to: user.email,
+  subject: "Reset Your FitMate Password",
+  html: `
+<h2>Reset Your Password</h2>
 
-      <p>Click the button below to reset your password.</p>
+<p>Click this link to reset your password:</p>
 
-      <a
-        href="http://localhost:5173/reset-password/${resetToken}"
-        style="
-          background:#2563eb;
-          color:white;
-          padding:12px 20px;
-          border-radius:8px;
-          text-decoration:none;
-          display:inline-block;
-        "
-      >
-        Reset Password
-      </a>
+<p>
+<a href="http://localhost:5173/reset-password/${resetToken}">
+http://localhost:5173/reset-password/${resetToken}
+</a>
+</p>
 
-      <p>This link expires in 1 hour.</p>
-    `,
-  });
+<p>This link expires in 1 hour.</p>
+`,
+});
 
   return {
     success: true,
@@ -166,10 +172,14 @@ const forgotPassword = async (email) => {
 };
 
 const resetPassword = async (token, newPassword) => {
+  console.log("Received token:", token);
+
   const user = await User.findOne({
     resetPasswordToken: token,
     resetPasswordExpires: { $gt: Date.now() },
   });
+
+  console.log("Found user:", user);
 
   if (!user) {
     throw new Error("Invalid or expired reset link.");
@@ -178,7 +188,6 @@ const resetPassword = async (token, newPassword) => {
   const hashedPassword = await bcrypt.hash(newPassword, 10);
 
   user.password = hashedPassword;
-
   user.resetPasswordToken = undefined;
   user.resetPasswordExpires = undefined;
 

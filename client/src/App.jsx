@@ -9,6 +9,9 @@ import Meal from "./pages/Meal";
 import Progress from "./pages/Progress";
 import AI from "./pages/AI";
 import FitnessCoach from "./pages/FitnessCoach";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
+
 
 function App() {
   return (
@@ -27,6 +30,12 @@ function App() {
 <Route
   path="/fitness-coach"
   element={<FitnessCoach />}
+/>
+<Route path="/forgot-password" element={<ForgotPassword />} />
+
+<Route
+  path="/reset-password/:token"
+  element={<ResetPassword />}
 />
     </Routes>
   );

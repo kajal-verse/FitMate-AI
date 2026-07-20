@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { FaDumbbell } from "react-icons/fa";
 import { loginUser } from "../services/authService";
 
+
 export default function Login() {
   const navigate = useNavigate();
 
@@ -112,6 +113,14 @@ export default function Login() {
               className="w-full border border-gray-300 rounded-xl p-3 focus:ring-2 focus:ring-green-500 outline-none"
             />
           </div>
+          <div className="text-right mt-2">
+  <Link
+    to="/forgot-password"
+    className="text-blue-600 hover:underline"
+  >
+    Forgot Password?
+  </Link>
+</div>
 
           <button
             type="submit"
